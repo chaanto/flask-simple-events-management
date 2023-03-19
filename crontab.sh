@@ -1,1 +1,1 @@
-0 * * * * /test_jublia/email_script.sh
+*/5 * * * * /test_jublia/email_script.sh

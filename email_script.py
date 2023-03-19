@@ -16,12 +16,10 @@ class auto_send_email :
             now = datetime.now()
             #get email queue
             q_emails = Emails.query.filter_by(status='QUEUE')
+            count = 0
             for email in q_emails :
                 email_datetime = email.send_date_time
                 #compare current time with email send time
-                print('now', now)
-                print('email_datetime', email_datetime)
-                print('>', now >=email_datetime)
                 if now >=email_datetime :
                     current_email = email.json()
                     email_subject = current_email['email_subject']
@@ -47,14 +45,17 @@ class auto_send_email :
                         email.status = 'FAILED'
                         email.failed_reason = result['message_data']['reason']
                     db.session.commit()
-            
+                    
+                    count+=1
+                response['message_data'] = {
+                    'sent_email_count' : count
+                }
         except :
             print(traceback.format_exc())
             response['message_action'] = "SEND_EMAIL_FAILED"
             response['message_data']   = {
                 "reason" : str(sys.exc_info())
             }
-        print('Response ======================', response)
         return response
     #end def
 #end class
