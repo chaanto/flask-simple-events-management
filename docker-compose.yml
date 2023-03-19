@@ -1,0 +1,27 @@
+version: "3.9"
+
+services:
+  jublia_test:
+    container_name: jublia_test
+    image: .
+    build: .
+    ports:
+      - "4000:4000"
+    environment:
+      - DB_URL=postgresql://postgres:postgres@flask_db:5432/jublia_test
+    depends_on :
+      - flask_db
+  flask_db :
+    container_name: jublia_test
+    image: postgres:12
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_USER=postgres
+      - POSTGRES_DB=jublia_test
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+volumes:
+  pgdata: {}

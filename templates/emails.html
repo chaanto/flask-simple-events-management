@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emails</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">Emails</h1>
+        <div class="ui center aligned header">
+            <a href="/v1/events" style="text-decoration:none;">Events</a>
+            <a href="/" style="text-decoration:none;">Emails</a>
+        </div>
+
+        {% for email in emails %}
+        <div class="ui segment">
+            <p class="ui big header">Participant Name : {{ email.email_name }}</p>
+            <p class="ui big header">Participant Email : {{ email.email_email }}</p>
+            <p class="ui big header">Event ID : {{ email.event_id }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Emails</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">Emails</h1>
+
+        <form class="ui form" action="/save_emails" method="POST">
+            <div class="field">
+                <label>Emails</label>
+                <div>
+                    <input type="text" name="email_name" placeholder="Enter name..." required><br>
+                    <input type="email" name="email_email" placeholder="Enter email..." required><br>
+                </div>
+                <select name="event_id" id="event_id">
+                    {% for event in events %}
+                        <option value="{{event.event_id}}">{{event.event_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="ui blue button" type="submit">Add</button>
+        </form>
+        <hr> {% for email in emails %}
+        <div class="ui segment">
+            <p class="ui big header">{{ email.name }}</p>
+            <p class="ui big header">{{ email.major }}</p>
+
+            <form class="ui form" action="/emails/{{email_id}}" method="POST">
+                <div class="field">
+                    <input type="text" name="email_name" placeholder="Enter name..."><br>
+                    <input type="text" name="email_email" placeholder="Enter email..."><br>
+                    <select name="event_id" id="event_id">
+                        {% for event in events %}
+                            <option value="{{event.event_id}}">{{event.event_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="ui blue button" type="submit">UPDATE</button>
+            </form>
+
+            <br>
+            <a class="ui red button" href="/v1/emails/delete/{{email.email_id}}">Delete</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>

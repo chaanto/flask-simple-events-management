@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Events</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">Events</h1>
+        <div class="ui center aligned header">
+            <a href="/v1/participants" style="text-decoration:none;">Participants</a>
+            <a href="/" style="text-decoration:none;">Emails</a>
+        </div>
+        <form class="ui form" action="/v1/events" method="POST">
+            <div class="field">
+                <label> Name</label>
+                <input type="text" name="event_name" placeholder="Enter name..." required><br>
+            </div>
+            <button class="ui blue button" type="submit" onClick="redirectPage">Add</button>
+        </form>
+        <hr> {% for event in events %}
+        <div class="ui segment">
+            <p class="ui big header">{{ event.event_name }}</p>
+            <p class="ui big header">{{ event.participant_ids }}</p>
+
+            <form class="ui form" action="/v1/events/{{event.event_id}}" method="POST">
+                <div class="field">
+                    <input type="text" name="event_name" placeholder="Enter name..."><br>
+                </div>
+                <button class="ui blue button" type="submit" onClick="redirectPage">UPDATE</button>
+            </form>
+            <br>
+            <a class="ui red button" href="/v1/events/delete/{{event.event_id}}">Delete</a>
+        </div>
+        {% endfor %}
+    </div>
+
+    <script>
+        function redirectPage() {
+          window.location.href="/v1/events";  
+        }
+      </script>
+</body>
+
+</html>

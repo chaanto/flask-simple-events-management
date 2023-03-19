@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particpants</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">Particpants</h1>
+        <div class="ui center aligned header">
+            <a href="/v1/events" style="text-decoration:none;">Events</a>
+            <a href="/" style="text-decoration:none;">Emails</a>
+        </div>
+
+        {% for participant in participants %}
+        <div class="ui segment">
+            <p class="ui big header">Participant Name : {{ participant.participant_name }}</p>
+            <p class="ui big header">Participant Email : {{ participant.participant_email }}</p>
+            <p class="ui big header">Event ID : {{ participant.event_id }}</p>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
+
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Particpants</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
+</head>
+
+<body>
+    <div style="margin-top: 50px;" class="ui container">
+        <h1 class="ui center aligned header">Particpants</h1>
+
+        <form class="ui form" action="/v1/participants" method="POST">
+            <div class="field">
+                <label>Particpants Name</label>
+                <div>
+                    <input type="text" name="participant_name" placeholder="Enter name..." required><br>
+                    <input type="email" name="participant_email" placeholder="Enter email..." required><br>
+                </div>
+                <select name="event_id" id="event_id">
+                    {% for event in events %}
+                        <option value="{{event.event_id}}">{{event.event_name}}</option>
+                    {% endfor %}
+                </select>
+            </div>
+            <button class="ui blue button" type="submit">Add</button>
+        </form>
+        <hr> {% for participant in participants %}
+        <div class="ui segment">
+            <p class="ui big header">{{ participant.name }}</p>
+            <p class="ui big header">{{ participant.major }}</p>
+
+            <form class="ui form" action="/participants/{{participant_id}}" method="POST">
+                <div class="field">
+                    <input type="text" name="participant_name" placeholder="Enter name..."><br>
+                    <input type="text" name="participant_email" placeholder="Enter email..."><br>
+                    <select name="event_id" id="event_id">
+                        {% for event in events %}
+                            <option value="{{event.event_id}}">{{event.event_name}}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+                <button class="ui blue button" type="submit">UPDATE</button>
+            </form>
+
+            <br>
+            <a class="ui red button" href="/v1/participants/delete/{{participant.participant_id}}">Delete</a>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+
+</html>
