@@ -1,6 +1,9 @@
 import traceback
 import sys
 import os
+import datetime
+import email_lib
+
 from flask import Flask, request, jsonify, make_response, render_template, redirect
 from flask_sqlalchemy import SQLAlchemy
 from os import environ
@@ -59,7 +62,9 @@ class Emails(db.Model) :
     email_subject = db.Column(db.String(255), nullable=False)
     email_body = db.Column(db.String(5000), nullable=False)
     send_date_time = db.Column(db.DateTime)
-    event_id = db.relationship('Events', backref="email_events", lazy=True)
+    events = db.relationship('Events', backref="email_events", lazy=True)
+    event_id = db.Column(db.Integer, db.ForeignKey('events.event_id'), nullable=True)
+    failed_reason = db.Column(db.String(5000), nullable=True)
     status = db.Column(db.String(255), nullable=False)
     
     def __repr__(self) :
@@ -68,9 +73,9 @@ class Emails(db.Model) :
     def json(self) :
         return {
             'email_id': self.email_id,
-            'emaiil_subject' : self.emaiil_subject,
-            'emaiil_body' : self.emaiil_body,
-            'send_date_time': self.send_date_time,
+            'email_subject' : self.email_subject,
+            'email_body' : self.email_body,
+            'send_date_time': datetime.datetime.strftime(self.send_date_time, '%d %b %Y %H:%M'),
             'status': self.status,
             'event_id': self.event_id,
         }
@@ -209,7 +214,6 @@ def create_participant():
     }
     try :
         data = request.form.to_dict()
-        print('========== data ==============', data)
         new_participant = Participants(
             participant_name=data['participant_name'], 
             participant_email=data['participant_email'], 
@@ -298,7 +302,7 @@ def update_participant(participant_id) :
     return response
 #end def
 
-@app.route('/v1/participants/delete/<int:participant_id>', methods=['DELETE'])
+@app.route('/v1/participants/delete/<int:participant_id>')
 def delete_participant(participant_id) :
     response = {
         'message_action' : "REMOVE_PARTICIPANT_SUCCESS",
@@ -351,12 +355,12 @@ def save_emails():
     }
     try :
         data = request.form.to_dict()
-        print('========== data ==============', data)
         new_emails = Emails(
             email_subject=data['email_subject'], 
             email_body=data['email_body'], 
             event_id=data['event_id'],
-            send_datetime=data['datetime']
+            send_date_time=data['send_date_time'],
+            status="QUEUE"
         )
         db.session.add(new_emails)
         db.session.commit()
@@ -364,14 +368,58 @@ def save_emails():
         response = redirect('/v1/emails')
     except :
         print(traceback.format_exc())
-        response['message_action'] = "CREATE_PARTICIPANT_FAILED"
+        response['message_action'] = "CREATE_EMAIL_FAILED"
         response['message_data']   = {
             "reason" : str(sys.exc_info())
         }
                   
     return response
+
+@app.route('/v1/emails/<int:email_id>', methods=['POST'])
+def update_email(email_id) :
+    response = {
+        'message_action' : "UPDATE_EMAIL_SUCCESS",
+        'message_data'   : {}
+    }
+    try : 
+        data = request.form.to_dict()
+        email = Emails.query.filter_by(email_id=email_id).first()
+        email.email_subject = data['email_subject']
+        email.email_body = data['email_body']
+        email.event_id = data['event_id']
+        email.send_date_time= data['send_date_time']
+        db.session.commit()
+        response = redirect('/v1/emails')
+    except :
+        print(traceback.format_exc())
+        response['message_action'] = "UPDATE_EMAIL_FAILED"
+        response['message_data']   = {
+            "reason" : str(sys.exc_info())
+        }
+        
+    return response
+#end def
+
+@app.route('/v1/emails/delete/<int:email_id>')
+def delete_email(email_id) :
+    response = {
+        'message_action' : "REMOVE_EMAIL_SUCCESS",
+        'message_data'   : {}
+    }
+    try : 
+        email = Emails.query.filter_by(email_id=email_id).first()
+        db.session.delete(email)
+        db.session.commit()
+        response = redirect('/v1/emails')
+    except :
+        print(traceback.format_exc())
+        response['message_action'] = "REMOVE_EMAIL_FAILED"
+        response['message_data']   = {
+            "reason" : str(sys.exc_info())
+        }
+        
+    return response
+#end def
+
 #========================= End Routes ============================#
-
-
-app.run(debug=True)
 

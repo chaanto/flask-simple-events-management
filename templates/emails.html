@@ -10,21 +10,7 @@
 </head>
 
 <body>
-    <div style="margin-top: 50px;" class="ui container">
-        <h1 class="ui center aligned header">Emails</h1>
-        <div class="ui center aligned header">
-            <a href="/v1/events" style="text-decoration:none;">Events</a>
-            <a href="/" style="text-decoration:none;">Emails</a>
-        </div>
-
-        {% for email in emails %}
-        <div class="ui segment">
-            <p class="ui big header">Participant Name : {{ email.email_name }}</p>
-            <p class="ui big header">Participant Email : {{ email.email_email }}</p>
-            <p class="ui big header">Event ID : {{ email.event_id }}</p>
-        </div>
-        {% endfor %}
-    </div>
+   
 </body>
 
 </html>
@@ -44,14 +30,43 @@
 <body>
     <div style="margin-top: 50px;" class="ui container">
         <h1 class="ui center aligned header">Emails</h1>
+        
+        <div class="ui center aligned header">
+            <a href="/v1/events" style="text-decoration:none;">Events</a>
+            <a href="/v1/participants" style="text-decoration:none;">Participants</a>
+        </div>
+
+        {% for email in emails %}
+        <div class="ui segment">
+            <label class="ui big header">Email Subject</label>
+            <p>
+                {{ email.email_subject }}
+            </p>
+            <label class="ui big header">Email Body</label>
+            <p style="white-space: pre-line">
+                {{ email.email_body }}
+            </p>
+            <label class="ui big header">Send Datetime</label>
+            <p>
+                {{ email.send_date_time }}
+            </p>
+            <label class="ui big header">Send Datetime</label>
+            <p>{{ email.status }}</p>
+            <label class="ui big header">Event ID</label>
+            <p> {{ email.event_id }}</p></p>
+        </div>
+        {% endfor %}
+
 
         <form class="ui form" action="/save_emails" method="POST">
             <div class="field">
-                <label>Emails</label>
-                <div>
-                    <input type="text" name="email_name" placeholder="Enter name..." required><br>
-                    <input type="email" name="email_email" placeholder="Enter email..." required><br>
-                </div>
+                <label>Email Subject</label>
+                <input type="text" name="email_subject" placeholder="Hi there" required/><br>
+                <label>Email Body</label>
+                <textarea style="white-space: pre-line" name="email_body" placeholder="How are you today?" required></textarea><br>
+                <label>Auto Send Datetime</label>
+                <input type="datetime-local" name="send_date_time" required/><br>
+                <label>Event</label>
                 <select name="event_id" id="event_id">
                     {% for event in events %}
                         <option value="{{event.event_id}}">{{event.event_name}}</option>
@@ -60,26 +75,33 @@
             </div>
             <button class="ui blue button" type="submit">Add</button>
         </form>
-        <hr> {% for email in emails %}
+        <hr> 
+        {% for email in emails %}
         <div class="ui segment">
-            <p class="ui big header">{{ email.name }}</p>
-            <p class="ui big header">{{ email.major }}</p>
-
-            <form class="ui form" action="/emails/{{email_id}}" method="POST">
-                <div class="field">
-                    <input type="text" name="email_name" placeholder="Enter name..."><br>
-                    <input type="text" name="email_email" placeholder="Enter email..."><br>
-                    <select name="event_id" id="event_id">
-                        {% for event in events %}
-                            <option value="{{event.event_id}}">{{event.event_name}}</option>
-                        {% endfor %}
-                    </select>
-                </div>
-                <button class="ui blue button" type="submit">UPDATE</button>
-            </form>
-
-            <br>
-            <a class="ui red button" href="/v1/emails/delete/{{email.email_id}}">Delete</a>
+            <label class="ui big header">Email Subject</label>
+            <p>{{ email.email_subject }}</p>
+            <label class="ui big header">Email Body</label>
+            <p style="white-space: pre-line">{{ email.email_body }}</p>
+            <div>
+                <form class="ui form" action="/v1/emails/{{email.email_id}}" method="POST">
+                    <div class="field">
+                        <label>Email Subject</label>
+                        <input type="text" name="email_subject" placeholder="Hi there" required/><br>
+                        <label>Email Body</label>
+                        <textarea style="white-space: pre-line" name="email_body" placeholder="How are you today?" required></textarea><br>
+                        <label>Auto Send Datetime</label>
+                        <input type="datetime-local" name="send_date_time" required/><br>
+                        <label>Event</label>
+                        <select name="event_id" id="event_id">
+                            {% for event in events %}
+                                <option value="{{event.event_id}}">{{event.event_name}}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button class="ui blue button" type="submit">UPDATE</button>
+                </form>
+                <a style="position:relative" class="ui red button" href="/v1/emails/delete/{{email.email_id}}">Delete</a>
+            </div>
         </div>
         {% endfor %}
     </div>
